@@ -1,5 +1,6 @@
 /*
 Setting up entire Project connecting with database, NVC, deploy in server Heroku.
+note you can use: npm install --no-fund <YOUR PACKAGE NAME> to prevent fund messages
 
 npm init -y  => default all parameters to YES inside package.json
 set “main” : “server.js”,
@@ -19,13 +20,14 @@ In package.json, add these lines:
   Create "routes" folder === routes are called controlers
   Create "models" folder for database models
   This is MVC (models, views, controler=routes)  intruction setup
-  when do routes, integrate them with views
+  Now, when you finish routes, integrate them with views
 
   To work with database install mongoose
   npm i mongoose
   then install dotenv to load enviroment variables into the application
   npm i --save-dev dotenv
-  create a file .env
+  create a file .env and add enviromental variable for mongoose connection such as:
+  DATABASE_URL=mongodb+srv://<user>:<password>@iot-cluster-1iwy8.mongodb.net/<database name>?retryWrites=true&w=majority
 
 Setup application with Git and create a file "".gitignore"
 and put in there all files you dont want to include in git repository
@@ -40,33 +42,49 @@ and copy the commands on your terminal
 then follow the instruction for Heroku setup on this link minute 20:
 https://youtu.be/qj2oDkvc4dQ
 
+To run the server anytime type: npm run devStart
+
 
 */
-	if (process.env.NODE_ENV !== 'production'){
-		//require('dotenv').load();
-		require('dotenv').parse();
-		//Use .parse() instead
-	}
+	/*if (process.env.NODE_ENV !== 'production'){
+		 require('dotenv').config();
+		
+	}*/
 	const express = require('express');
 	const app = express();
 	const expressLayouts = require('express-ejs-layouts');
 	//this a how import the routes index.js into server.js
-	const indexRouter = require('./routes/index'); 
+	const indexRouter = require('./routes/index');
+	const authorRouter = require('./routes/authors');
+
+
+	require ('dotenv/config'); 
 
 	app.set('view engine', 'ejs');
-	app.set('views', _dirname + '/views'); // do not forget to create "views" Folder 
-	app.set('layout', 'layouts/layout'); //All files use this layout
-	app.set(expressLayouts); //tell express to use expressLayouts variable above
+	app.set('views', __dirname + '/views'); //  __dirname with double "_" and do not forget to create "views" Folder 
+	//app.set('view options', { layout:'layouts/layout.ejs' });
+	app.set('layout', 'layouts/layout'); //Another way. All files use this layout
+	app.use(expressLayouts); //tell express to use expressLayouts variable above
 	app.use(express.static('public')); //do not forget to create "public" Folder
-	
+
+	//connect to DB mongoDB
 	const mongoose = require ('mongoose');
 	mongoose.connect(process.env.DATABASE_URL, {
-		useNewUrlParser : true});
+		useNewUrlParser : true, useUnifiedTopology: true});
 	const db = mongoose.connection;
 	db.on('error', error => console.error(error));
-	db.once('open', () => console.log('Connected to Mongoose'));
+	db.once('open', () => console.log('Connected to MongoDB'));
 
+/*
+	//other way to connect to DB mongoDB
+	mongoose.connect(
+    	process.env.DB_CONNECTION,
+    	{ useNewUrlParser: true, useUnifiedTopology: true },
+    	() => console.log('connected to DB!')
+	);
+*/
 	app.use('/', indexRouter);
+	app.use('/authors', authorRouter);
 
 	app.listen(process.env.PORT || 3000);
 	

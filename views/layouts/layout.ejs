@@ -1,25 +1,14 @@
-/*
-In order to have sintax highlighted inside of ejs file
-make sure you download the ejs language support 
-extension in visual studio 
-Do exclamation point key + Enter to add basic html code.
-In the "<body></body>" section we will put all code inside
-of our application before and after everysingle page
-note: <%- body %> This is going to include every single
-other one of our pages right in here (body page)
-*/
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>myProject</title>
+    <title>projectauthors</title>
 </head>
 <body>
-    before
     <br>
-    <%- body %>
-    <br>
-    after    
+    <%- include ('../partials/header.ejs')  %> 
+    <%- body %> 
+    <br>   
 </body>
 </html>
