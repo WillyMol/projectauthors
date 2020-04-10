@@ -28,6 +28,9 @@ In package.json, add these lines:
   npm i --save-dev dotenv
   create a file .env and add enviromental variable for mongoose connection such as:
   DATABASE_URL=mongodb+srv://<user>:<password>@iot-cluster-1iwy8.mongodb.net/<database name>?retryWrites=true&w=majority
+ 
+   Install body-parser to easy access inputs elements from the server 
+   npm i body-parser
 
 Setup application with Git and create a file "".gitignore"
 and put in there all files you dont want to include in git repository
@@ -46,13 +49,14 @@ To run the server anytime type: npm run devStart
 
 
 */
-	/*if (process.env.NODE_ENV !== 'production'){
-		 require('dotenv').config();
-		
-	}*/
+	/* if (process.env.NODE_ENV !== 'production'){
+		 require('dotenv').config();		
+	} */
 	const express = require('express');
 	const app = express();
 	const expressLayouts = require('express-ejs-layouts');
+	const bodyParser = require('body-parser');
+
 	//this a how import the routes index.js into server.js
 	const indexRouter = require('./routes/index');
 	const authorRouter = require('./routes/authors');
@@ -66,23 +70,24 @@ To run the server anytime type: npm run devStart
 	app.set('layout', 'layouts/layout'); //Another way. All files use this layout
 	app.use(expressLayouts); //tell express to use expressLayouts variable above
 	app.use(express.static('public')); //do not forget to create "public" Folder
-
+	app.use(bodyParser.urlencoded({limit:'10mb', extended: false}));
 	//connect to DB mongoDB
-	const mongoose = require ('mongoose');
+	/* const mongoose = require ('mongoose');
 	mongoose.connect(process.env.DATABASE_URL, {
 		useNewUrlParser : true, useUnifiedTopology: true});
 	const db = mongoose.connection;
 	db.on('error', error => console.error(error));
 	db.once('open', () => console.log('Connected to MongoDB'));
+ */
 
-/*
 	//other way to connect to DB mongoDB
+	const mongoose = require ('mongoose');
 	mongoose.connect(
-    	process.env.DB_CONNECTION,
+    	process.env.DATABASE_URL,
     	{ useNewUrlParser: true, useUnifiedTopology: true },
     	() => console.log('connected to DB!')
 	);
-*/
+
 	app.use('/', indexRouter);
 	app.use('/authors', authorRouter);
 
